@@ -1,0 +1,111 @@
+% Loading the dataset
+
+dataSet = load('DataSet.txt');
+
+% Storing the values in seperate matrices
+
+x = dataSet(:, 1);
+
+y = dataSet(:, 2);
+
+
+normalization = true;
+
+% Applying mean normalization to our dataset
+
+if (normalization)
+
+    maxX = max(x);
+    minX = min(x);
+    x = (x - maxX) / (maxX - minX);
+
+end
+% Adding a column of ones to the beginning of the 'x' matrix
+
+x = [ones(length(x), 1) x];
+
+% Plotting the dataset
+
+figure;
+
+plot(x(:, 2), y, 'rx', 'MarkerSize', 10);
+
+xlabel('Size ( squared meters )');
+
+ylabel('Price');
+
+title('Housing Prices'); 
+% Running gradient descent on the data
+
+% 'x' is our input matrix
+
+% 'y' is our output matrix
+
+% 'parameters' is a matrix containing our initial theta and slope
+
+parameters = [0; 0];
+
+learningRate = 0.1;
+
+repetition = 1500;
+
+[parameters, costHistory] = gradient(x, y, parameters, learningRate, repetition);
+% Plotting our final hypothesis
+
+figure;
+
+plot(min(x(:, 2)):max(x(:, 2)), parameters(1) + parameters(2) * (min(x(:, 2)):max(x(:, 2))));
+
+hold on;
+% Plotting the dataset on the same figure
+
+plot(x(:, 2), y, 'rx', 'MarkerSize', 10);
+% Plotting our cost function on a different figure to see how we did
+
+figure;
+
+plot(costHistory, 1:repetition);
+ Finally predicting the output of the provided input
+
+input = 120;
+
+if (normalization)
+    input = (input - maxX) / (maxX - minX);
+end
+
+output = parameters(1) + parameters(2) * input;
+
+disp(output);
+% Getting the length of our dataset
+
+m = length(y);
+
+% Creating a matrix of zeros for storing our cost function history
+
+costHistory = zeros(repetition, 1); 
+% Running gradient descent
+
+for i = 1:repetition        
+
+    % Calculating the transpose of our hypothesis
+
+    h = (x * parameters - y)';        
+
+    % Updating the parameters
+
+    parameters(1) = parameters(1) - learningRate * (1/m) * h * x(:, 1);
+
+    parameters(2) = parameters(2) - learningRate * (1/m) * h * x(:, 2);        
+
+    % Keeping track of the cost function
+
+    costHistory(i) = cost(x, y, parameters);        
+
+end 
+function [ cost ] = cost( x, y, parameters )
+
+    %   Calculates the cost function
+
+    cost = (x * parameters - y)' * (x * parameters - y) / (2 * length(y));    
+
+end
